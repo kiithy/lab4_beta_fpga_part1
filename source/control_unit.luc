@@ -107,6 +107,12 @@ module control_unit (
     
     // Task 10
     // PCSEL for BNE/BEQ
+    if (opcode == b011101 && z == 1){ // BEQ, branch if z == 1
+      pcsel = b001;
+    }
+    else if (opcode == b011110 && z == 0){ // BNE, branch if z != 1
+      pcsel = b001;
+    }
 
     
   
@@ -114,7 +120,15 @@ module control_unit (
     // IRQ handling
     // IRQ can happen only in user mode (ia31 is 0)
     // If IRQ happens during kernel mode, it will not be serviced until we return to user mode
-
+    if (irq_sampler.q & slowclk & ~ia31){
+      pcsel = b100;
+      wasel = 1;
+      werf = 1;
+      wdsel = b00;
+      wr = 0;
+      // clear interrupt bit 
+      irq_sampler.d = 0;
+    }
     
     
     
